@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer - GATE 2050</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        .timer-display {
+            font-family: 'Courier New', monospace;
+            font-size: 5rem;
+            text-shadow: 0 0 10px rgba(0, 247, 255, 0.5);
+        }
+        .work-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #d32f2f 100%);
+        }
+        .break-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #388e3c 100%);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen text-white">
+    <div id="timer-container" class="work-mode w-full h-full flex flex-col items-center justify-center transition-all duration-500">
+        <div id="session-type" class="text-2xl mb-4 font-bold">FOCUS SESSION</div>
+        <div id="timer" class="timer-display mb-8">25:00</div>
+        <div class="flex space-x-4">
+            <button id="start-btn" class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-full text-lg">
+                <i class="fas fa-play mr-2"></i> Start
+            </button>
+            <button id="pause-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white py-3 px-6 rounded-full text-lg" disabled>
+                <i class="fas fa-pause mr-2"></i> Pause
+            </button>
+            <button id="reset-btn" class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-full text-lg">
+                <i class="fas fa-redo mr-2"></i> Reset
+            </button>
+        </div>
+        <div class="mt-8 text-center">
+            <div class="text-xl mb-2">Sessions Completed</div>
+            <div id="sessions-counter" class="text-3xl font-bold">0/4</div>
+        </div>
+        <button id="focus-lock-btn" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+            <i class="fas fa-lock mr-2"></i> Enable Focus Lock
+        </button>
+    </div>
+
+    <script>
+        const timerDisplay = document.getElementById('timer');
+        const sessionTypeDisplay = document.getElementById('session-type');
+        const sessionsCounter = document.getElementById('sessions-counter');
+        const timerContainer = document.getElementById('timer-container');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const focusLockBtn = document.getElementById('focus-lock-btn');
+
+        let currentTime = 25 * 60; // 25 minutes in seconds
+        let isRunning = false;
+        let sessionsCompleted = 0;
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        // Update timer display
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(currentTime);
+        }
+
+        // Listen for timer updates from main process
+        window.electronAPI.onTimerUpdate((event, data) => {
+            currentTime = data.remaining;
+            updateDisplay();
+
+            if (data.sessionType === 'work') {
+                timerContainer.classList.remove('break-mode');
+                timerContainer.classList.add('work-mode');
+                sessionTypeDisplay.textContent = 'FOCUS SESSION';
+            } else {
+                timerContainer.classList.remove('work-mode');
+                timerContainer.classList.add('break-mode');
+                sessionTypeDisplay.textContent = 'BREAK TIME';
+            }
+        });
+
+        // Listen for timer reset
+        window.electronAPI.onTimerReset(() => {
+            currentTime = 25 * 60;
+            updateDisplay();
+            timerContainer.classList.remove('break-mode');
+            timerContainer.classList.add('work-mode');
+            sessionTypeDisplay.textContent = 'FOCUS SESSION';
+            sessionsCompleted = 0;
+            sessionsCounter.textContent = '0/4';
+        });
+
+        // Button event listeners
+        startBtn.addEventListener('click', () => {
+            window.electronAPI.startTimer();
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            window.electronAPI.pauseTimer();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+
+        resetBtn.addEventListener('click', () => {
+            window.electronAPI.resetTimer();
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        });
+
+        focusLockBtn.addEventListener('click', () => {
+            const pin = prompt('Enter your 4-digit PIN to enable Focus Lock:');
+            if (pin && pin.length === 4) {
+                window.electronAPI.enableFocusLock(pin);
+                alert('Focus Lock enabled! You cannot exit the app until the session completes.');
+            }
+        });
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
