@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE 2050 - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center">
+    <div class="glass-card rounded-xl p-8 w-96 shadow-2xl">
+        <h1 class="text-4xl font-bold text-white text-center mb-4">Dashboard</h1>
+        <div class="space-y-4">
+            <button id="start-pomodoro" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                <i class="fas fa-clock mr-2"></i> Start Pomodoro
+            </button>
+            <button id="open-calendar" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                <i class="fas fa-calendar-alt mr-2"></i> Open Calendar
+            </button>
+            <button id="subject-tracker" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                <i class="fas fa-book mr-2"></i> Subject Tracker
+            </button>
+            <button id="mock-test" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                <i class="fas fa-pencil-alt mr-2"></i> Mock Test
+            </button>
+            <button id="error-log" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition duration-200">
+                <i class="fas fa-exclamation-triangle mr-2"></i> Error Log
+            </button>
+        </div>
+    </div>
+
+    <script src="../scripts/dashboard.js"></script>
+</body>
+</html>
